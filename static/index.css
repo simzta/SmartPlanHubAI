@@ -1,0 +1,221 @@
+
+
+h3 {
+    text-align: center;
+}
+
+#intro {
+    background-color: grey;
+    padding: 3px;
+    margin: 15px;
+    margin-bottom: 5px;
+    border-style: ridge;
+    border-radius: 6px;
+    width: 90%;
+    align-items: center;
+    justify-content: center;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+#toggle {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 60px;
+    height: 60px;
+    font-size: 18px;
+    cursor: pointer;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+    z-index: 1000;
+}
+
+/* Styling for the Chatbot Container */
+#chatbot-container {
+    position: fixed;
+    bottom: 90px;
+    right: 20px;
+    width: 320px;
+    height: 400px;
+    max-width: 550px;
+    max-height:600px;
+    min-width: 320px;
+    min-height:400px;
+    background-color: #f8f9fa;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+    overflow-y: auto;
+    overflow-x: hidden;
+    z-index: 999;
+    display: none;
+    resize: both;
+    border-style: solid;
+    border-radius: 5px;
+    border-width: 2px;
+    box-sizing: border-box;
+    padding: 5px;
+}
+
+#filter-form {
+    background-color: lightblue;
+    width: (100%);
+    border: solid thin black;
+    padding: 5px;margin: 15px;
+}
+
+
+#filter-response {
+    word-wrap: break-word; 
+    overflow-wrap: break-word; 
+    overflow-y: auto; 
+    width: 100%;
+    height: 10%;
+    padding: 5px; 
+    margin: 5px 0;
+
+}
+
+
+#chatbot-container h3, #chatbot-container h4, #chatbot-container p {
+    margin-top: 0;
+    margin-bottom: 10px; 
+    color: #333; 
+}
+
+#chatbot-container form {
+    margin-bottom: 15px;
+}
+
+/* Styling for the Input and Select Fields */
+#chatbot-container input[type="text"], #chatbot-container select {
+    width: 90%;
+    padding: 5px; 
+    margin-bottom: 10px; 
+    border: 1px solid #ccc;
+    border-radius: 4px; 
+}
+
+/* Styling for Form Buttons */
+#chatbot-container button {
+    background-color: #28a745;
+    color: white;
+    border: none;
+    padding: 8px 15px;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s; /* Smooth transition for hover effect */
+}
+
+#chatbot-container button:hover {
+    background-color: #218838;
+}
+
+/* Styling for the Chat Container */
+#chat-container {
+    scroll-behavior: smooth;
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto;
+    border: 1px solid #ccc;
+    padding: 10px;
+    margin-left: auto;
+    margin-right:auto;
+    width: 88%;
+    max-width: 88%;
+    height: 100px; 
+    overflow-y: auto;
+    background-color: white;
+    border-radius: 4px;
+    
+}
+
+/* Message Styling */
+.message {
+    max-width: 80%; 
+    min-width: 20%; 
+    word-wrap: break-word; /* Break long words */
+    margin-bottom: 10px;
+    padding: 10px;
+    margin-bottom: 10px;
+    border-radius: 15px;
+}
+
+.user-message {
+    align-self: flex-start; /* Align user messages to start */
+    background-color: #d9edf7;
+    float: left;
+}
+
+.bot-message {
+    align-self: flex-end; /* Align bot messages to end */
+    background-color: #dff0d8;
+    float: right;
+}
+
+#arrow {
+    background: url('arrow.jpeg') no-repeat center center;
+    background-size: contain; 
+    position: absolute;
+    right: 5px;
+    width: 20px;
+    height: 20px;
+    border: none;
+    cursor: pointer;
+    outline: none;
+}
+
+#header {
+    background-color: #203867;
+    height: 8%;
+    color: white; 
+    text-shadow: 
+        -1px -1px 0 #000,  
+         1px -1px 0 #000,
+        -1px  1px 0 #000,
+         1px  1px 0 #000; 
+}
+
+#header h3{
+    color: white;
+}
+
+.title {
+    margin-left: 5%;
+}
+
+
+
+/* Adjust the padding of the input field to prevent overlapping */
+input[type="text"] {
+    flex-grow: 1;
+    padding-right: 30px; 
+}
+
+/* Typing Indicator Styling */
+#typing-indicator {
+    text-align: right;
+}
+
+.dot {
+    height: 10px;
+    width: 10px;
+    background-color: black;
+    border-radius: 50%;
+    display: inline-block;
+    margin: 0 3px;
+    animation: blink 1.2s infinite both;
+}
+
+@keyframes blink {
+    0%, 100% { opacity: 0; }
+    50% { opacity: 1; }
+}
+
+.dot:nth-child(1) { animation-delay: 0.0s; }
+.dot:nth-child(2) { animation-delay: 0.2s; }
+.dot:nth-child(3) { animation-delay: 0.4s; }
+
+
