@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, viewport-fit=cover"
+    />
+    <title>SmartPlanHub</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="./assets/styles.css" />
+  </head>
+  <body>
+    <!-- Header -->
+    <header class="header">
+      <div class="brand">SmartPlanHub</div>
+      <nav class="topnav">
+        <a href="#/dashboard" data-route>Dashboard</a>
+        <a href="#/assignments" data-route>Assignments</a>
+        <a href="#/planner" data-route>Planner</a>
+        <a href="#/projects" data-route>Projects</a>
+        <a href="#/settings" data-route>Settings</a>
+      </nav>
+    </header>
+
+    <!-- Layout -->
+    <div class="layout">
+      <aside class="sidebar">
+        <div class="sidebar-title">Quick Views</div>
+        <a href="#/assignments" data-route>All Assignments</a>
+        <a href="#/planner" data-route>Planner</a>
+        <a href="#/projects" data-route>Projects</a>
+      </aside>
+
+      <main id="app" class="content" aria-live="polite">
+        <!-- Content injected by app.js based on hash route -->
+      </main>
+    </div>
+
+    <!-- Chat Dock (placeholder, no functionality yet) -->
+    <button id="chat-toggle" class="chat-btn" aria-haspopup="dialog" aria-controls="chat-dock">
+      💬 Chat
+    </button>
+    <section id="chat-dock" class="chat-dock" role="dialog" aria-modal="false" aria-labelledby="chat-title" hidden>
+      <div class="chat-header">
+        <div id="chat-title" class="chat-title">Ask about assignments</div>
+        <button id="chat-close" class="chat-close" aria-label="Close chat">×</button>
+      </div>
+      <div class="chat-body">
+        <div class="chat-msg bot">Try: “What is due?”</div>
+        <div class="chat-msg bot">Or: “What should I do to prepare?”</div>
+      </div>
+      <div class="chat-input">
+        <input type="text" placeholder="Type a question…" />
+        <button disabled>Send</button>
+      </div>
+    </section>
+
+    <script src="./assets/app.js" type="module"></script>
+  </body>
+</html>
