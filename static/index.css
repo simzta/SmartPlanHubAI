@@ -5,7 +5,7 @@ h3 {
 }
 
 #intro {
-    background-color: grey;
+    background-color: rgb(252, 189, 240);
     padding: 3px;
     margin: 15px;
     margin-bottom: 5px;
@@ -22,10 +22,10 @@ h3 {
     position: fixed;
     bottom: 20px;
     right: 20px;
-    background-color: #007bff;
+    background-color: #f7941b;
     color: white;
     border: none;
-    border-radius: 50%;
+    border-radius: 40%;
     width: 60px;
     height: 60px;
     font-size: 18px;
@@ -37,15 +37,15 @@ h3 {
 /* Styling for the Chatbot Container */
 #chatbot-container {
     position: fixed;
-    bottom: 90px;
-    right: 20px;
-    width: 320px;
-    height: 400px;
-    max-width: 550px;
-    max-height:600px;
+    bottom: 50px;
+    right: 50px;
+    width: 3020px;
+    height: 4000px;
+    max-width: 1410px;
+    max-height:720px;
     min-width: 320px;
     min-height:400px;
-    background-color: #f8f9fa;
+    background-color: #ffdfaa;
     box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
     overflow-y: auto;
     overflow-x: hidden;
@@ -63,7 +63,7 @@ h3 {
     background-color: lightblue;
     width: (100%);
     border: solid thin black;
-    padding: 5px;margin: 15px;
+    padding: 7px;margin: 15px;
 }
 
 
@@ -93,8 +93,8 @@ h3 {
 #chatbot-container input[type="text"], #chatbot-container select {
     width: 90%;
     padding: 5px; 
-    margin-bottom: 10px; 
-    border: 1px solid #ccc;
+    margin-bottom: 90px; 
+    border: 1px solid #f9b5f0;
     border-radius: 4px; 
 }
 
@@ -110,7 +110,7 @@ h3 {
 }
 
 #chatbot-container button:hover {
-    background-color: #218838;
+    background-color: #f19f34;
 }
 
 /* Styling for the Chat Container */
@@ -119,13 +119,13 @@ h3 {
     display: flex;
     flex-direction: column;
     overflow-y: auto;
-    border: 1px solid #ccc;
+    border: 4px solid #ffc8f7;
     padding: 10px;
     margin-left: auto;
     margin-right:auto;
     width: 88%;
     max-width: 88%;
-    height: 100px; 
+    height: 350px; 
     overflow-y: auto;
     background-color: white;
     border-radius: 4px;
@@ -145,13 +145,13 @@ h3 {
 
 .user-message {
     align-self: flex-start; /* Align user messages to start */
-    background-color: #d9edf7;
+    background-color: #358cb7;
     float: left;
 }
 
 .bot-message {
     align-self: flex-end; /* Align bot messages to end */
-    background-color: #dff0d8;
+    background-color: #f299e5;
     float: right;
 }
 
@@ -168,9 +168,10 @@ h3 {
 }
 
 #header {
-    background-color: #203867;
-    height: 8%;
+    background-color: #f9b5f0;
+    height: 12%;
     color: white; 
+    border-radius: 4px;
     text-shadow: 
         -1px -1px 0 #000,  
          1px -1px 0 #000,

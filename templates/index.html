@@ -10,18 +10,18 @@
     <button id="toggle">Chat</button>
     <div id="chatbot-container">
         <div id='header'>
-            <h3>Welcome to the Code2College ChatBot</h3>
+            <h3>Welcome to the SmartPlanHub ChatBot</h3>
         </div>
         <div id="intro">
-            <p>Select a topic to chat with me about! I can answer questions, share information about us and our impact, or just chat! Try it out!</p>
+            <p>Please select a topic to chat with me about! I can answer questions, share information about your schedule, or just chat! Try it out!</p>
         </div>
         <div id="chat-container"></div> <!-- Chat container to display conversation -->
         <form id="inquiry-form" action="/handle_inquiry" method="post">
             <label for="topic">Choose a topic:</label>
             <select name="topic" id="topic">
-                <option value="code2college_courses">Code2College Courses</option>
-                <option value="code2college_general_info">Code2College General Info</option>
-                <option value="ai_course">AI Course</option>
+                <option value="code2college_courses">Schedule</option>
+                <option value="code2college_general_info">Upcoming</option>
+                <option value="ai_course">Past</option>
             </select>
             <input type="text" name="inquiry" placeholder="Type your message here..." autocomplete="off" size="50">
             <button id="submit" type="submit">Send</button>

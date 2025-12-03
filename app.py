@@ -1,3 +1,4 @@
+from __future__ import print_function
 from flask import Flask, render_template, request, jsonify, session
 from flask_session import Session  # Import Session
 import openai
@@ -90,3 +91,74 @@ def clear_session():
 
 if __name__ == '__main__':
   app.run(host="0.0.0.0", port=8080)
+
+
+
+
+### GOOGLE CALENDER CONNECTION.  ################
+
+
+import datetime
+import os.path
+
+from google.oauth2.credentials import Credentials
+from google_auth_oauthlib.flow import InstalledAppFlow
+from googleapiclient.discovery import build
+
+# If modifying SCOPES, delete token.json
+SCOPES = ['https://www.googleapis.com/auth/calendar']
+
+def get_calendar_service():
+    creds = None
+
+    # token.json stores the user’s access & refresh tokens
+    if os.path.exists('token.json'):
+        creds = Credentials.from_authorized_user_file('token.json', SCOPES)
+    else:
+        flow = InstalledAppFlow.from_client_secrets_file(
+            'credentials.json', SCOPES)
+        creds = flow.run_local_server(port=8080)
+        with open('token.json', 'w') as token:
+            token.write(creds.to_json())
+
+    service = build('calendar', 'v3', credentials=creds)
+    return service
+
+
+from google_calendar import get_calendar_service
+import datetime
+
+def add_event(summary, description, start_time, end_time):
+    service = get_calendar_service()
+
+    event = {
+        'summary': summary,
+        'description': description,
+        'start': {
+            'dateTime': start_time.isoformat(),
+            'timeZone': 'UTC',
+        },
+        'end': {
+            'dateTime': end_time.isoformat(),
+            'timeZone': 'UTC',
+        },
+    }
+
+    event_result = service.events().insert(calendarId='primary', body=event).execute()
+    
+    return event_result.get('htmlLink')
+
+
+start = datetime.datetime(2025, 1, 12, 12, 0)
+end   = datetime.datetime(2025, 1, 12, 13, 0)
+
+link = add_event(
+    "Chatbot Created Event",
+    "Created through Python chatbot.",
+    start, end
+)
+
+print("Event created:", link)
+
+
+
