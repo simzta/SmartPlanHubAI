@@ -1,7 +1,10 @@
 import datetime
 import json
+import logging
 import os
+import re
 import uuid
+import requests
 from flask import (Flask, render_template, request, jsonify, session,
                    send_from_directory, redirect, url_for)
 from flask_session import Session  # Import Session
@@ -21,6 +24,7 @@ app = Flask(__name__)
 app.config["SESSION_PERMANENT"] = False
 app.config["SESSION_TYPE"] = "filesystem"
 Session(app)
+app.logger.setLevel(logging.INFO)
 
 openai.api_key = os.getenv("OPENAI_API_KEY", "")
 
@@ -46,6 +50,75 @@ def _save_events(events):
     json.dump(events, f, indent=2)
 
 
+def _fetch_doc_text(url: str) -> str:
+  """Best-effort fetch of document text for public links."""
+  def google_doc_export(u: str) -> str:
+    match = re.search(r'/document/d/([A-Za-z0-9_-]+)', u)
+    if not match:
+      return ""
+    doc_id = match.group(1)
+    return f"https://docs.google.com/document/d/{doc_id}/export?format=txt"
+
+  def fetch(target: str) -> str:
+    app.logger.info(f"[docs] Fetching text from {target}")
+    resp = requests.get(target,
+                        timeout=12,
+                        headers={"User-Agent": "SmartPlanHub/1.0"})
+    app.logger.info(f"[docs] Response {resp.status_code} {resp.reason} for {target} (ct={resp.headers.get('content-type')})")
+    resp.raise_for_status()
+    content_type = resp.headers.get("content-type", "")
+    text = resp.text
+    if "text/html" in content_type:
+      text = re.sub(r'<script.*?>.*?</script>', ' ', text, flags=re.S | re.I)
+      text = re.sub(r'<style.*?>.*?</style>', ' ', text, flags=re.S | re.I)
+      text = re.sub(r'<[^>]+>', ' ', text)
+    text = re.sub(r'\s+', ' ', text).strip()
+    lower = text.lower()
+    permission_markers = [
+        "you need access", "request access", "sign in", "sign-in",
+        "permission denied", "you don’t have access", "you don't have access",
+        "document is not available"
+    ]
+    if len(text) < 200 or any(p in lower for p in permission_markers):
+      app.logger.warning(
+          f"[docs] Content from {target} looks like a permission wall or is too short (len={len(text)}); treating as empty"
+      )
+      return ""
+    app.logger.info(
+        f"[docs] Retrieved {len(text)} characters from {target} (content-type={content_type})")
+    return text[:6000]
+
+  export_url = google_doc_export(url)
+  tried = []
+  for target in [export_url, url]:
+    if not target or target in tried:
+      continue
+    tried.append(target)
+    try:
+      text = fetch(target)
+      if text:
+        return text
+    except Exception as exc:
+      app.logger.warning(f"[docs] Fetch failed for {target}: {exc}")
+      continue
+  return ""
+
+
+def _hydrate_docs(docs):
+  hydrated = []
+  for doc in docs or []:
+    d = dict(doc)
+    if d.get("url") and not d.get("content"):
+      fetched = _fetch_doc_text(d["url"])
+      if fetched:
+        d["content"] = fetched
+        app.logger.info(f"[docs] Hydrated doc '{d.get('title') or d.get('url')}' len={len(fetched)}")
+      else:
+        app.logger.warning(f"[docs] No content fetched for '{d.get('title') or d.get('url')}'")
+    hydrated.append(d)
+  return hydrated
+
+
 def _ai_enrich_event(event_payload):
   """Call OpenAI to generate notes/steps/progress for an event."""
   docs = event_payload.get("docs", [])
@@ -54,28 +127,49 @@ def _ai_enrich_event(event_payload):
       for d in docs
   ]) or "No documents provided."
 
+  due_str = event_payload.get("date")
+  due_in_days = None
+  try:
+    if due_str:
+      due_dt = datetime.date.fromisoformat(due_str)
+      due_in_days = (due_dt - datetime.date.today()).days
+  except Exception:
+    due_in_days = None
+
+  doc_texts = [d.get("content") for d in docs if d.get("content")]
+  doc_text_used = bool(doc_texts)
+  docs_text_blob = "\n\n---\n\n".join(doc_texts)[:8000] if doc_texts else ""
+  app.logger.info(
+      f"[ai] Enriching event '{event_payload.get('title')}' with {len(docs)} doc(s); "
+      f"doc_text_present={doc_text_used} due={due_str}")
+
   system_prompt = (
-      "You are SmartPlanHub AI. Given an event, attached documents, and description, "
-      "return concise planning help and a completion estimate. Respond as JSON with keys: "
-      "{\"notes\": string, \"steps\": [strings], \"progress_percent\": integer 0-100}."
+      "You are SmartPlanHub AI. Given an event, attached documents (including draft text), "
+      "and description, return concise planning help and a completion estimate grounded in the actual document text. "
+      "Treat progress_percent as how complete the work is right now based on the draft: "
+      "rough outlines ~10-25%, partial draft ~30-60%, mostly complete ~70-90%, final polish ~95+. "
+      "Also include: reasoning (why you picked that %), and guidance (concise tips aware of due date vs today). "
+      "If doc_text is empty, state that you cannot analyze because the document content was unavailable; do not infer from titles alone. "
+      "Respond as JSON with keys: {\"notes\": string, \"steps\": [strings], \"progress_percent\": integer 0-100, "
+      "\"reasoning\": string, \"guidance\": [strings]}."
   )
 
   user_payload = {
       "title": event_payload.get("title"),
       "description": event_payload.get("description"),
       "date": event_payload.get("date"),
+      "today": datetime.date.today().isoformat(),
+      "due_in_days": due_in_days,
       "docs": docs,
-      "docs_summary": docs_blob
+      "docs_summary": docs_blob,
+      "doc_text": docs_text_blob
   }
 
   if not openai.api_key:
-    return {
-        "notes":
-        "AI analysis unavailable (missing OPENAI_API_KEY).",
-        "steps": ["Review the attached documents.", "Break work into actionable steps.",
-                  "Estimate effort and update progress."],
-        "progress_percent": 20
-    }
+    raise RuntimeError("AI analysis unavailable (missing OPENAI_API_KEY).")
+
+  if not docs_text_blob:
+    raise RuntimeError("Document text could not be fetched; ensure the link is public and retry.")
 
   try:
     resp = openai.chat.completions.create(
@@ -95,8 +189,8 @@ def _ai_enrich_event(event_payload):
     content = resp.choices[0].message.content
     parsed = json.loads(content)
   except Exception as exc:
-    app.logger.warning(f"AI enrichment failed, using fallback: {exc}")
-    parsed = {}
+    app.logger.error(f"[ai] AI enrichment failed: {exc}")
+    raise
 
   def clamp_percent(val, default=30):
     try:
@@ -108,7 +202,14 @@ def _ai_enrich_event(event_payload):
   return {
       "notes": parsed.get("notes") or "No AI notes available.",
       "steps": parsed.get("steps") or ["Review documents and outline next steps."],
-      "progress_percent": clamp_percent(parsed.get("progress_percent"))
+      "progress_percent": clamp_percent(parsed.get("progress_percent")),
+      "reasoning": parsed.get("reasoning") or "Progress estimated from available documents.",
+      "guidance": parsed.get("guidance") or [
+          "Work backward from the due date to allocate time.",
+          "Draft, then revise with citations.",
+          "Re-check sources for gaps before finalizing."
+      ],
+      "doc_used": doc_text_used
   }
 
 
@@ -210,6 +311,20 @@ def events_api():
   if request.method == 'GET':
     return jsonify({"events": _load_events()})
 
+  if request.method == 'DELETE':
+    payload = request.get_json(silent=True) or {}
+    event_id = str(payload.get("id"))
+    if not event_id:
+      return jsonify({'error': 'id is required to delete an event'}), 400
+    events = _load_events()
+    before = len(events)
+    events = [e for e in events if str(e.get("id")) != event_id]
+    if len(events) == before:
+      return jsonify({'error': 'event not found'}), 404
+    _save_events(events)
+    app.logger.info(f"[events] Deleted event {event_id}")
+    return jsonify({'status': 'deleted'})
+
   payload = request.get_json(silent=True) or {}
   title = payload.get("title")
   date_str = payload.get("date")
@@ -217,6 +332,7 @@ def events_api():
     return jsonify({'error': 'title and date are required'}), 400
 
   docs = payload.get("docs") or []
+  docs = _hydrate_docs(docs)
   event = {
       "id": str(uuid.uuid4()),
       "title": title,
@@ -227,13 +343,40 @@ def events_api():
       "docs": docs
   }
 
-  event["ai"] = _ai_enrich_event(event)
+  app.logger.info(f"[events] Creating event '{title}' on {date_str} with {len(docs)} doc(s)")
+  try:
+    event["ai"] = _ai_enrich_event(event)
+  except Exception as exc:
+    app.logger.error(f"[events] Failed to analyze event '{title}': {exc}")
+    return jsonify({"error": str(exc)}), 500
 
   events = _load_events()
   events.append(event)
   _save_events(events)
 
   return jsonify(event), 201
+
+
+@app.route('/api/events/<event_id>/analyze', methods=['POST'])
+def reanalyze_event(event_id):
+  events = _load_events()
+  id_str = str(event_id)
+  match = next((e for e in events if str(e.get("id")) == id_str), None)
+  if not match:
+    return jsonify({
+        'error': 'event not found',
+        'known_ids': [e.get("id") for e in events]
+    }), 404
+
+  app.logger.info(f"[events] Re-analyzing event '{match.get('title')}' ({id_str})")
+  match["docs"] = _hydrate_docs(match.get("docs") or [])
+  try:
+    match["ai"] = _ai_enrich_event(match)
+  except Exception as exc:
+    app.logger.error(f"[events] Failed to analyze event '{match.get('title')}': {exc}")
+    return jsonify({"error": str(exc)}), 500
+  _save_events(events)
+  return jsonify(match)
 
 
 if __name__ == '__main__':

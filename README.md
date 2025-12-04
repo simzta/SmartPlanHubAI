@@ -14,6 +14,7 @@ Combining smart scheduling, progress tracking, and assistance using AI conversat
 - Sima-styled front-end lives in `web/` and is served at `/` (start at `http://localhost:8080/`).
 - Harshita chatbot remains available at `/chatbot`, using the topic prompt files in `topic_prompts/`.
 - In-app calendar now supports creating events with attached document links and AI enrichment via `/api/events`.
+  - If docs are public links, the backend will fetch their text on create or when you click “Update analysis” on an event card.
 
 ## Getting started
 1. Install dependencies: `pip install -r requirements.txt`.

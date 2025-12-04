@@ -91,6 +91,30 @@ async function fetchJSON(url, opts = {}) {
                 status.textContent = 'Could not add event.';
                 console.error(err);
             }
+        },
+        async reanalyze(id) {
+            try {
+                await fetchJSON(`/api/events/${id}/analyze`, { method: 'POST' });
+                status.textContent = 'Analysis updated.';
+                await state.load();
+            } catch (err) {
+                status.textContent = 'Could not update analysis.';
+                console.error(err);
+            }
+        },
+        async remove(id) {
+            try {
+                await fetchJSON('/api/events', {
+                    method: 'DELETE',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ id })
+                });
+                status.textContent = 'Event deleted.';
+                await state.load();
+            } catch (err) {
+                status.textContent = 'Could not delete event.';
+                console.error(err);
+            }
         }
     };
 
@@ -161,11 +185,44 @@ async function fetchJSON(url, opts = {}) {
                     <ul class="list" style="margin-top:8px;">
                         ${(ev.ai?.steps || []).map(s => `<li>${s}</li>`).join('')}
                     </ul>
+                    ${ev.ai?.reasoning ? `<div class="muted" style="margin-top:6px;font-size:13px;">Why this percent: ${ev.ai.reasoning}</div>` : ''}
+                    ${(ev.ai?.guidance && ev.ai.guidance.length) ? `<ul class="list" style="margin-top:6px;">${ev.ai.guidance.map(g => `<li>${g}</li>`).join('')}</ul>` : ''}
+                    ${ev.ai?.doc_used === false ? `<div class="muted" style="font-size:12px;">Document text unavailable; analysis used only titles/summaries.</div>` : ''}
                     <div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:8px;">
                         ${docs.map(d => `<a class="doc-chip" href="${d.url || '#'}" target="_blank" rel="noreferrer">${d.title || 'Document'}</a>`).join('')}
                     </div>
+                    <div style="margin-top:10px; display:flex; gap:8px; justify-content:flex-end; flex-wrap:wrap;">
+                        <button class="btn ghost reanalyze" data-id="${ev.id || ''}" ${ev.id ? '' : 'disabled'}>Update analysis</button>
+                        <button class="btn ghost danger delete" data-id="${ev.id || ''}" ${ev.id ? '' : 'disabled'}>Delete</button>
+                    </div>
                 `;
                 list.appendChild(wrap);
+
+                const btn = wrap.querySelector('.reanalyze');
+                if (btn && ev.id) {
+                    btn.addEventListener('click', async ()=>{
+                        btn.disabled = true;
+                        const original = btn.textContent;
+                        btn.textContent = 'Updating...';
+                        status.textContent = 'Updating analysis...';
+                        await state.reanalyze(ev.id);
+                        btn.textContent = original;
+                        btn.disabled = false;
+                    });
+                }
+
+                const delBtn = wrap.querySelector('.delete');
+                if (delBtn && ev.id) {
+                    delBtn.addEventListener('click', async ()=>{
+                        delBtn.disabled = true;
+                        const original = delBtn.textContent;
+                        delBtn.textContent = 'Deleting...';
+                        status.textContent = 'Deleting event...';
+                        await state.remove(ev.id);
+                        delBtn.textContent = original;
+                        delBtn.disabled = false;
+                    });
+                }
             });
     }
 

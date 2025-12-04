@@ -41,6 +41,7 @@ body {
 /* Buttons */
 .btn { background: linear-gradient(135deg, var(--brand), var(--brand-2)); color: #0c1020; border: 0; padding: 10px 16px; border-radius: 999px; font-weight: 700; text-decoration: none; display: inline-block; box-shadow: var(--shadow); }
 .btn.ghost { background: transparent; color: var(--text); border: 1px solid rgba(255,255,255,0.15); box-shadow: none; }
+.btn.danger { border-color: rgba(255,106,106,0.6); color: #ffb3b3; }
 .btn.small { padding: 8px 12px; font-weight: 600; }
 .link { color: var(--brand-2); text-decoration: none; font-weight: 600; }
 
