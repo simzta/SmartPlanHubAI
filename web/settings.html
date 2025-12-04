@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>SmartPlanHub · Settings</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css" />
+</head>
+<body data-page="settings">
+    <header class="site-header">
+        <a class="brand" href="index.html">SmartPlanHub</a>
+        <nav class="site-nav" aria-label="Primary">
+            <a href="dashboard.html">Dashboard</a>
+            <a href="assignments.html">Assignments</a>
+            <a href="calendar.html">Calendar</a>
+            <a href="settings.html" class="active">Settings</a>
+            <a href="/chatbot">Chatbot</a>
+        </nav>
+        <button class="nav-toggle" aria-label="Toggle menu">☰</button>
+    </header>
+
+
+    <main class="container narrow">
+        <form class="form card" id="settings-form">
+            <h2>Account</h2>
+            <label class="field">
+                <span>Display name</span>
+                <input class="input" type="text" id="displayName" placeholder="Your name" />
+            </label>
+            <label class="field">
+                <span>Time zone</span>
+                <select class="input" id="timezone">
+                    <option>America/Chicago</option>
+                    <option>America/Los_Angeles</option>
+                    <option>America/New_York</option>
+                    <option>UTC</option>
+                </select>
+            </label>
+
+
+            <h2>Integrations</h2>
+            <div class="integration">
+                <div>
+                    <strong>Google Calendar</strong>
+                    <p class="muted">Connect to sync events and due dates.</p>
+                </div>
+                <button type="button" class="btn small" id="connect-google">Connect</button>
+            </div>
+            <div class="integration">
+                <div>
+                    <strong>OpenAI</strong>
+                    <p class="muted">Enable AI suggestions and study plans.</p>
+                </div>
+                <button type="button" class="btn small" id="connect-openai">Connect</button>
+            </div>
+
+
+            <div class="actions">
+                <button class="btn" type="submit">Save settings</button>
+            </div>
+        </form>
+    </main>
+
+
+    <footer class="site-footer">
+        <p>© <span id="year"></span> SmartPlanHub</p>
+    </footer>
+
+
+    <script src="app.js"></script>
+</body>
+</html>

@@ -9,3 +9,32 @@ Questions as shown can be asked:
 * “What should I do to prepare”
 
 Combining smart scheduling, progress tracking, and assistance using AI conversation, SMartPlanHub helps users manage time efficiently; staying on track with their academic goals.
+
+## Combined branch overview
+- Sima-styled front-end lives in `web/` and is served at `/` (start at `http://localhost:8080/`).
+- Harshita chatbot remains available at `/chatbot`, using the topic prompt files in `topic_prompts/`.
+- In-app calendar now supports creating events with attached document links and AI enrichment via `/api/events`.
+
+## Getting started
+1. Install dependencies: `pip install -r requirements.txt`.
+2. Copy `.env.example` to `.env` and set `OPENAI_API_KEY` (and optionally `FLASK_SECRET_KEY`).
+3. Run the app: `python app.py` (defaults to port 8080). Visit `/` for the Sima UI or `/chatbot` for the chatbot UI.
+
+## In-app calendar API
+- Create events: `POST /api/events` with JSON
+  ```json
+  {
+    "title": "History essay draft",
+    "date": "2025-01-20",
+    "description": "First draft review",
+    "docs": [
+      {
+        "title": "Essay outline",
+        "url": "https://docs.google.com/...",
+        "summary": "Outline + key arguments"
+      }
+    ]
+  }
+  ```
+- List events: `GET /api/events` → `{ "events": [...] }`
+- The backend calls OpenAI (if `OPENAI_API_KEY` is set) to add notes, next steps, and a `progress_percent` estimate per event. If the key is missing, a lightweight fallback is returned.

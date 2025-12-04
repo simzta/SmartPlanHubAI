@@ -9,6 +9,8 @@
 *.user
 *.userosscache
 *.sln.docstates
+.DS_Store
+flask_session/
 *.env
 
 # User-specific files (MonoDevelop/Xamarin Studio)

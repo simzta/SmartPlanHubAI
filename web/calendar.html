@@ -1,0 +1,88 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>SmartPlanHub · Calendar</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css" />
+</head>
+<body data-page="calendar">
+    <header class="site-header">
+        <a class="brand" href="index.html">SmartPlanHub</a>
+        <nav class="site-nav" aria-label="Primary">
+            <a href="dashboard.html">Dashboard</a>
+            <a href="assignments.html">Assignments</a>
+            <a href="calendar.html" class="active">Calendar</a>
+            <a href="settings.html">Settings</a>
+            <a href="/chatbot">Chatbot</a>
+        </nav>
+        <button class="nav-toggle" aria-label="Toggle menu">☰</button>
+    </header>
+
+
+    <main class="container">
+        <section class="card">
+            <div class="card__header">
+                <h2>Add calendar event</h2>
+            </div>
+            <form id="event-form" class="stack">
+                <div class="field">
+                    <label for="event-title">Title</label>
+                    <input id="event-title" class="input" type="text" placeholder="e.g. History Essay Draft" required />
+                </div>
+                <div class="field">
+                    <label for="event-date">Date</label>
+                    <input id="event-date" class="input" type="date" required />
+                </div>
+                <div class="field">
+                    <label for="event-desc">Description</label>
+                    <textarea id="event-desc" class="input" rows="2" placeholder="What is this event about?"></textarea>
+                </div>
+                <div class="field grid-2">
+                    <div>
+                        <label for="doc-title">Doc title</label>
+                        <input id="doc-title" class="input" type="text" placeholder="e.g. Essay Outline" />
+                    </div>
+                    <div>
+                        <label for="doc-url">Doc link</label>
+                        <input id="doc-url" class="input" type="url" placeholder="https://docs.google.com/..." />
+                    </div>
+                </div>
+                <div class="field">
+                    <label for="doc-notes">Doc summary (optional)</label>
+                    <textarea id="doc-notes" class="input" rows="2" placeholder="Paste key points so AI can analyze."></textarea>
+                </div>
+                <div class="toolbar">
+                    <button class="btn" type="submit">Add event</button>
+                    <div id="event-status" class="muted"></div>
+                </div>
+            </form>
+        </section>
+
+        <section class="card">
+            <div class="calendar-head" style="margin-bottom: 14px;">
+                <button id="prev-month" class="btn small">‹</button>
+                <h2 id="month-label">Month YYYY</h2>
+                <button id="next-month" class="btn small">›</button>
+            </div>
+            <div id="calendar-grid" class="calendar-grid" role="grid" aria-label="Monthly calendar"></div>
+        </section>
+
+        <section class="card">
+            <div class="card__header">
+                <h2>Events & progress</h2>
+            </div>
+            <div id="event-list" class="stack"></div>
+        </section>
+    </main>
+
+
+    <footer class="site-footer">
+        <p>© <span id="year"></span> SmartPlanHub</p>
+    </footer>
+
+
+    <script src="app.js"></script>
+</body>
+</html>

@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>SmartPlanHub · Assignments</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css" />
+</head>
+<body data-page="assignments">
+    <header class="site-header">
+        <a class="brand" href="index.html">SmartPlanHub</a>
+        <nav class="site-nav" aria-label="Primary">
+            <a href="dashboard.html">Dashboard</a>
+            <a href="assignments.html" class="active">Assignments</a>
+            <a href="calendar.html">Calendar</a>
+            <a href="settings.html">Settings</a>
+            <a href="/chatbot">Chatbot</a>
+        </nav>
+        <button class="nav-toggle" aria-label="Toggle menu">☰</button>
+    </header>
+
+
+    <main class="container">
+        <div class="toolbar">
+            <input type="search" class="input" id="search" placeholder="Search assignments…" />
+            <select id="course-filter" class="input">
+                <option value="">All courses</option>
+            </select>
+            <select id="status-filter" class="input">
+                <option value="">All status</option>
+                <option value="todo">To‑Do</option>
+                <option value="inprogress">In Progress</option>
+                <option value="done">Done</option>
+            </select>
+        </div>
+
+
+        <div class="assignment-list" id="assignment-list"></div>
+    </main>
+
+
+    <footer class="site-footer">
+        <p>© <span id="year"></span> SmartPlanHub</p>
+    </footer>
+
+
+    <script src="app.js"></script>
+</body>
+</html>

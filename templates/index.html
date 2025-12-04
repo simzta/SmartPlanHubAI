@@ -3,25 +3,28 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Code2College ChatBot</title>
+    <title>SmartPlanHub ChatBot</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='index.css') }}">
 </head>
 <body>
     <button id="toggle">Chat</button>
     <div id="chatbot-container">
         <div id='header'>
-            <h3>Welcome to the Code2College ChatBot</h3>
+            <h3>Welcome to the SmartPlanHub Assistant</h3>
         </div>
         <div id="intro">
-            <p>Select a topic to chat with me about! I can answer questions, share information about us and our impact, or just chat! Try it out!</p>
+            <p>Select a topic to chat with me about! I can answer questions, share information about your plan, or just chat. Try it out!</p>
         </div>
         <div id="chat-container"></div> <!-- Chat container to display conversation -->
         <form id="inquiry-form" action="/handle_inquiry" method="post">
             <label for="topic">Choose a topic:</label>
             <select name="topic" id="topic">
-                <option value="code2college_courses">Code2College Courses</option>
-                <option value="code2college_general_info">Code2College General Info</option>
-                <option value="ai_course">AI Course</option>
+                <option value="code2college_courses">Courses</option>
+                <option value="code2college_general_info">General Info</option>
+                <option value="ai_course">AI</option>
             </select>
             <input type="text" name="inquiry" placeholder="Type your message here..." autocomplete="off" size="50">
             <button id="submit" type="submit">Send</button>
