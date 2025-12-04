@@ -3,105 +3,89 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Code2College ChatBot</title>
+    <title>Smart Plan Hub ChatBot</title>
     <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='index.css') }}">
 </head>
 <body>
     <button id="toggle">Chat</button>
+
     <div id="chatbot-container">
         <div id='header'>
-            <h3>Welcome to the Code2College ChatBot</h3>
+            <h3>SmartPlanHub AI Assistant</h3>
         </div>
+
         <div id="intro">
-            <p>Select a topic to chat with me about! I can answer questions, share information about us and our impact, or just chat! Try it out!</p>
+            <p>Ask me anything — deadlines, progress, plans. I'm your scheduler!</p>
         </div>
-        <div id="chat-container"></div> <!-- Chat container to display conversation -->
+
+        <div id="chat-container"></div>
+
         <form id="inquiry-form" action="/handle_inquiry" method="post">
-            <label for="topic">Choose a topic:</label>
-            <select name="topic" id="topic">
-                <option value="code2college_courses">Code2College Courses</option>
-                <option value="code2college_general_info">Code2College General Info</option>
-                <option value="ai_course">AI Course</option>
-            </select>
-            <input type="text" name="inquiry" placeholder="Type your message here..." autocomplete="off" size="50">
+            <input type="text" name="inquiry" id="inquiry" placeholder="Ask: What do I have due? How am I doing?" autocomplete="off">
             <button id="submit" type="submit">Send</button>
         </form>
     </div>
 
-    <script>
-        document.addEventListener("DOMContentLoaded", function () {
-            const chatbotToggle = document.getElementById('toggle');
-            const chatbotContainer = document.getElementById('chatbot-container');
-            const inquiryForm = document.getElementById("inquiry-form");
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+    const toggleBtn = document.getElementById("toggle");
+    const chatBox = document.getElementById("chat-container");
+    const form = document.getElementById("inquiry-form");
+    const input = document.getElementById("inquiry");
 
-            chatbotToggle.onclick = function() {
-                chatbotContainer.style.display = chatbotContainer.style.display === 'none' ? 'block' : 'none';
-            };
+    toggleBtn.onclick = () => {
+        const chat = document.getElementById("chatbot-container");
+        chat.style.display = chat.style.display === "none" ? "block" : "none";
+    };
 
-            inquiryForm.onsubmit = function(e) {
-                e.preventDefault();
-                const topic = inquiryForm.querySelector("select[name='topic']").value;
-                const inquiry = inquiryForm.querySelector("input[name='inquiry']").value;
+    form.onsubmit = (e) => {
+        e.preventDefault();
+        const text = input.value.trim();
+        if (!text) return;
 
-                addMessageToChat('user', inquiry);
-                addTypingIndicator();
+        addMessage("user-message", text);
+        showTyping();
 
-                
-                fetch("/handle_inquiry", {
-                    method: "POST",
-                    body: new URLSearchParams({
-                        "topic": topic,
-                        "inquiry": inquiry
-                    }),
-                    headers: {
-                        "Content-Type": "application/x-www-form-urlencoded",
-                    },
-                })
-                .then(response => response.json())
-                .then(data => {
-                    removeTypingIndicator();
-                    addMessageToChat('bot', data.response);
-                })
-                .catch(error => {
-                    console.error("Error:", error);
-                    removeTypingIndicator();
-                });
-
-                // Clear the input field after submitting
-                inquiryForm.querySelector("input[name='inquiry']").value = '';
-            };
-
-            function addMessageToChat(sender, message) {
-                const chatContainer = document.getElementById("chat-container");
-                const messageDiv = document.createElement("div");
-                messageDiv.classList.add("message", sender === 'user' ? 'user-message' : 'bot-message');
-                messageDiv.innerHTML = message.replace(/\n/g, "<br>");
-                chatContainer.appendChild(messageDiv);
-                chatContainer.scrollTop = chatContainer.scrollHeight;
-            }
-
-            function addTypingIndicator() {
-                const chatContainer = document.getElementById("chat-container");
-                const typingIndicator = document.createElement("div");
-                typingIndicator.id = "typing-indicator";
-                typingIndicator.classList.add("typing-indicator");
-
-                for (let i = 0; i < 3; i++) {
-                    const dot = document.createElement("div");
-                    dot.classList.add("dot");
-                    typingIndicator.appendChild(dot);
-                }
-
-                chatContainer.appendChild(typingIndicator);
-            }
-
-            function removeTypingIndicator() {
-                const typingIndicator = document.getElementById("typing-indicator");
-                if (typingIndicator) {
-                    typingIndicator.remove();
-                }
-            }
+        fetch("/handle_inquiry", {
+            method: "POST",
+            headers: { "Content-Type": "application/x-www-form-urlencoded" },
+            body: new URLSearchParams({ inquiry: text })
+        })
+        .then(res => res.json())
+        .then(data => {
+            hideTyping();
+            addMessage("bot-message", data.response);
+        })
+        .catch(() => {
+            hideTyping();
+            addMessage("bot-message", "Server error.");
         });
-    </script>
+
+        input.value = "";
+    };
+
+    function addMessage(className, text) {
+        const msg = document.createElement("div");
+        msg.classList.add("message", className);
+        msg.innerHTML = text;
+        chatBox.appendChild(msg);
+        chatBox.scrollTop = chatBox.scrollHeight;
+    }
+
+    function showTyping() {
+        hideTyping();
+        const t = document.createElement("div");
+        t.id = "typing";
+        t.classList.add("message", "bot-message");
+        t.innerHTML = "Typing...";
+        chatBox.appendChild(t);
+    }
+
+    function hideTyping() {
+        const t = document.getElementById("typing");
+        if (t) t.remove();
+    }
+});
+</script>
 </body>
 </html>

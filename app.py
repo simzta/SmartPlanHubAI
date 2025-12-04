@@ -1,92 +1,78 @@
-from flask import Flask, render_template, request, jsonify, session
-from flask_session import Session  # Import Session
-import openai
 import os
 
+from dotenv import load_dotenv
+from flask import Flask, render_template, request, jsonify, session
+from flask_session import Session
+import openai
+
+# ----------------- REQUIRED -----------------
+# Load environment variables from .env for local development
+load_dotenv()
+
+# Temporary fallback retains the existing key for testing; remove ASAP.
+openai.api_key = os.getenv("OPENAI_API_KEY")
+# -------------------------------------------
+
 app = Flask(__name__)
-app.config["SESSION_PERMANENT"] = False
-app.config["SESSION_TYPE"] = "filesystem"
+app.config["SESSION_TYPE"]="filesystem"
 Session(app)
+app.secret_key = "smartplanhub_secure_key"
 
-openai.api_key = ''
-
-app.secret_key = 'supersecretkey'
-
-topic_options = [
-    'code2college_courses', 'code2college_general_info'
-    'ai_course'
-]
-
-
-@app.route('/')
+@app.route("/")
 def home():
-  return render_template('index.html', topic_options=topic_options)
+    return render_template("index.html")
 
-
-@app.route('/get_conversation', methods=['GET'])
-def get_conversation():
-  if 'conversation' not in session:
-    session['conversation'] = []
-  return jsonify({'conversation': session['conversation']})
-
-
-@app.route('/handle_inquiry', methods=['POST'])
+# ---------------------------------------------
+# MAIN AI CHATBOT ENDPOINT
+# ---------------------------------------------
+@app.route("/handle_inquiry", methods=["POST"])
 def handle_inquiry():
-  user_inquiry = request.form['inquiry']
-  topic_selection = request.form[
-      'topic']  # Retrieve the topic from the form data
+    user_inquiry = request.form["inquiry"]
 
-  if 'conversation' not in session:
-    session['conversation'] = []
+    # AI behavior — responds like ChatGPT, task planner style
+    system_prompt = """
+    You are SmartPlanHub AI — an intelligent planning assistant.
+    You respond like ChatGPT: friendly, structured, step-by-step.
+    You know deadlines, progress %, and create study plans automatically.
 
-  # Append the user's inquiry to the conversation
-  session['conversation'].append({"role": "user", "content": user_inquiry})
+    If asked:
+    - "What is due?" → list assignments sorted soonest first
+    - "How is progress?" → summarize completion %
+    - "Plan my work" → generate 3–5 day schedule
+    """
 
-  # Select the appropriate text file based on the user's dropdown selection
-  text_file_path = f'topic_prompts/{topic_selection}.txt'
-  if not os.path.exists(text_file_path):
-    return jsonify({
-        'response':
-        'The selected topic is not available. Please choose another one.'
-    })
+    # ===== TASKS (replace with real DB later!) =====
+    assignments = [
+        {"name":"History Essay", "due":"2025-01-30", "progress":0.50},
+        {"name":"Math Homework 7", "due":"2025-02-03", "progress":0.20},
+        {"name":"Computer Science Project", "due":"2025-02-10", "progress":0.0}
+    ]
 
-  # Read the content of the text file
-  with open(text_file_path, 'r') as file:
-    topic_info = file.read()
+    # store memory
+    if "conversation" not in session:
+        session["conversation"] = []
 
-  # The messages structure for the API call
-  messages = [{
-      "role": "system",
-      "content": topic_info
-  }] + session['conversation']
-
-  try:
-    # Make API call to OpenAI using the messages
-    response = openai.chat.completions.create(model="gpt-3.5-turbo-1106",
-                                              messages=messages)
-    # Extract the content from the response
-    gpt_response = response.choices[0].message.content
-
-    # Append the GPT response to the conversation history
-    session['conversation'].append({
-        "role": "assistant",
-        "content": gpt_response
-    })
-
-    # Return the GPT response
-    return jsonify({'response': gpt_response})
-  except Exception as e:
-    # Log the error and return a message
-    app.logger.error(f"An error occurred: {e}")
-    return jsonify({'error': str(e)}), 500
+    messages = [{"role":"system", "content":system_prompt}]
+    messages += session["conversation"]
+    messages.append({"role":"user","content":user_inquiry})
 
 
-@app.route('/clear_session', methods=['GET'])
-def clear_session():
-  # Clear the session
-  session.clear()
-  return jsonify({'status': 'session cleared'})
+    # 📌 SEND TO OPENAI
+    response = openai.chat.completions.create(
+        model="gpt-4o-mini",
+        messages=messages,
+        temperature=0.7,
+        max_tokens=350
+    )
+
+    bot_reply = response.choices[0].message.content
+
+    # save memory
+    session["conversation"].append({"role":"user","content":user_inquiry})
+    session["conversation"].append({"role":"assistant","content":bot_reply})
+
+    return jsonify({"response": bot_reply})
 
 
-if __name__ == '__main__':
-  app.run(host="0.0.0.0", port=8080)
+if __name__ == "__main__":
+    app.run(debug=True, host="0.0.0.0", port=8083)
