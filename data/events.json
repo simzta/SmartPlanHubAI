@@ -1,38 +1,8 @@
 [
   {
-    "id": "80956bfd-c883-47ff-af10-08bc3ec1d532",
-    "title": "history essay draft",
-    "description": "I need to have a complete draft ready on the history of the civil rights movement in America",
-    "date": "2025-12-10",
-    "start_time": null,
-    "end_time": null,
-    "docs": [
-      {
-        "title": "Essay Outline",
-        "url": "https://docs.google.com/document/d/1E_kzyLunoIH0MQAFu610j_CkL8JQrSj9U1JAscak-4Y/edit?usp=sharing",
-        "summary": "",
-        "content": "History Essay Ex - Google Docs JavaScript isn't enabled in your browser, so this file can't be opened. Enable and reload. This browser version is no longer supported. Please upgrade to a supported browser. History Essay Ex Tab &nbsp; &nbsp; External &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; Share Sign in File Edit View Tools Help Accessibility Debug"
-      }
-    ],
-    "ai": {
-      "notes": "No AI notes available.",
-      "steps": [
-        "Review documents and outline next steps."
-      ],
-      "progress_percent": 30,
-      "reasoning": "Progress estimated from available documents.",
-      "guidance": [
-        "Work backward from the due date to allocate time.",
-        "Draft, then revise with citations.",
-        "Re-check sources for gaps before finalizing."
-      ],
-      "doc_used": true
-    }
-  },
-  {
-    "id": "faea1cb0-9c4c-400b-87be-e30a3cc00fd2",
+    "id": "08f2f979-1f5d-4b7f-823e-ccc79de0ee0b",
     "title": "history essay draft: Civil rights",
-    "description": "civil rights history",
+    "description": "usa civil rights history",
     "date": "2025-12-10",
     "start_time": null,
     "end_time": null,
@@ -45,18 +15,18 @@
       }
     ],
     "ai": {
-      "notes": "Based on the provided content, the essay draft is incomplete and requires additional information, including major legislation and a conclusion with citations.",
+      "notes": "Based on the provided draft, the essay is incomplete and requires additional content, including major legislation, conclusion, and citations. The draft covers the background, key events, nonviolent protests, and organizational aspects of the Civil Rights Movement. However, it lacks information on major legislation such as the Civil Rights Act of 1964, Voting Rights Act of 1965, March on Washington, and Freedom Rides. Additionally, it needs a conclusion summarizing the impact of the movement and its connection to today, along with citations. The progress is estimated at around 40% due to the incomplete sections and the need for additional content, conclusion, and citations.",
       "steps": [
-        "Expand on major legislation like Civil Rights Act of 1964, Voting Rights Act of 1965, March on Washington, Freedom Rides, etc.",
-        "Write a conclusion summarizing the impact of the Civil Rights Movement and connect it to today. Include citations for the information provided.",
-        "Review and revise the entire essay for coherence and completeness."
+        "Add information about major legislation like the Civil Rights Act of 1964, Voting Rights Act of 1965, March on Washington, and Freedom Rides.",
+        "Write a conclusion summarizing the impact of the Civil Rights Movement and its connection to today.",
+        "Incorporate citations to support the content and provide references for the information presented."
       ],
       "progress_percent": 40,
-      "reasoning": "The draft covers the early part of the Civil Rights Movement but lacks information on major legislation and a conclusion. It needs substantial additional content and revisions.",
+      "reasoning": "The draft covers the background, key events, nonviolent protests, and organizational aspects of the Civil Rights Movement, but it lacks information on major legislation, a conclusion, and citations. The completion estimate is based on the need to add significant content and finalize the essay.",
       "guidance": [
-        "Research and gather information on major legislation and events related to the Civil Rights Movement to expand the essay.",
-        "Ensure to include citations for all the information provided in the essay.",
-        "Allocate sufficient time for reviewing and revising the entire essay for coherence and completeness."
+        "Ensure to include detailed information about the major legislation and events mentioned in the incomplete sections.",
+        "When writing the conclusion, emphasize the lasting impact of the Civil Rights Movement and its relevance to contemporary society.",
+        "Integrate citations from reputable sources to strengthen the essay's credibility and provide evidence for the presented information."
       ],
       "doc_used": true
     }

@@ -28,11 +28,7 @@ app.logger.setLevel(logging.INFO)
 
 openai.api_key = os.getenv("OPENAI_API_KEY", "")
 
-app.secret_key = os.getenv("FLASK_SECRET_KEY", "supersecretkey")
-
-topic_options = [
-    'code2college_courses', 'code2college_general_info', 'ai_course'
-]
+app.secret_key = os.getenv("FLASK_SECRET_KEY", "smartplanhub_secure_key")
 
 
 def _load_events():
@@ -176,6 +172,7 @@ def _ai_enrich_event(event_payload):
         model="gpt-3.5-turbo-1106",
         temperature=0.2,
         max_tokens=400,
+        response_format={"type": "json_object"},
         messages=[
             {
                 "role": "system",
@@ -186,8 +183,14 @@ def _ai_enrich_event(event_payload):
                 "content": json.dumps(user_payload, indent=2)
             },
         ])
-    content = resp.choices[0].message.content
-    parsed = json.loads(content)
+    msg = resp.choices[0].message
+    parsed = getattr(msg, "parsed", None)
+    if parsed is None:
+      raw_content = msg.content
+      if not raw_content or not str(raw_content).strip():
+        raise RuntimeError("AI returned empty content while JSON was expected.")
+      app.logger.error(f"[ai] Raw content from model (decode attempt): {raw_content!r}")
+      parsed = json.loads(raw_content)
   except Exception as exc:
     app.logger.error(f"[ai] AI enrichment failed: {exc}")
     raise
@@ -238,7 +241,7 @@ def asset_files(path):
 
 @app.route('/chatbot')
 def chatbot():
-  return render_template('index.html', topic_options=topic_options)
+  return render_template('index.html')
 
 
 @app.route('/get_conversation', methods=['GET'])
@@ -251,41 +254,57 @@ def get_conversation():
 @app.route('/handle_inquiry', methods=['POST'])
 def handle_inquiry():
   user_inquiry = request.form['inquiry']
-  topic_selection = request.form[
-      'topic']  # Retrieve the topic from the form data
+
+  system_prompt = """
+  You are SmartPlanHub AI — an intelligent planning assistant.
+  You respond like ChatGPT: friendly, structured, step-by-step.
+  You know deadlines, progress %, and create study plans automatically.
+
+  If asked:
+  - "What is due?" → list assignments sorted soonest first
+  - "How is progress?" → summarize completion %
+  - "Plan my work" → generate 3–5 day schedule
+  """
+
+  assignments = [
+      {
+          "name": "History Essay",
+          "due": "2025-01-30",
+          "progress": 0.50
+      },
+      {
+          "name": "Math Homework 7",
+          "due": "2025-02-03",
+          "progress": 0.20
+      },
+      {
+          "name": "Computer Science Project",
+          "due": "2025-02-10",
+          "progress": 0.0
+      }
+  ]
 
   if 'conversation' not in session:
     session['conversation'] = []
 
-  # Append the user's inquiry to the conversation
-  session['conversation'].append({"role": "user", "content": user_inquiry})
-
-  # Select the appropriate text file based on the user's dropdown selection
-  text_file_path = f'topic_prompts/{topic_selection}.txt'
-  if not os.path.exists(text_file_path):
-    return jsonify({
-        'response':
-        'The selected topic is not available. Please choose another one.'
-    })
-
-  # Read the content of the text file
-  with open(text_file_path, 'r') as file:
-    topic_info = file.read()
-
-  # The messages structure for the API call
-  messages = [{
-      "role": "system",
-      "content": topic_info
-  }] + session['conversation']
+  messages = [{"role": "system", "content": system_prompt}]
+  messages += session['conversation']
+  messages.append({"role": "user", "content": user_inquiry})
 
   try:
     # Make API call to OpenAI using the messages
-    response = openai.chat.completions.create(model="gpt-3.5-turbo-1106",
+    response = openai.chat.completions.create(model="gpt-4o-mini",
+                                              temperature=0.7,
+                                              max_tokens=350,
                                               messages=messages)
     # Extract the content from the response
     gpt_response = response.choices[0].message.content
 
-    # Append the GPT response to the conversation history
+    # Append the conversation history
+    session['conversation'].append({
+        "role": "user",
+        "content": user_inquiry
+    })
     session['conversation'].append({
         "role": "assistant",
         "content": gpt_response
@@ -306,16 +325,17 @@ def clear_session():
   return jsonify({'status': 'session cleared'})
 
 
-@app.route('/api/events', methods=['GET', 'POST'])
+@app.route('/api/events', methods=['GET', 'POST', 'DELETE'])
 def events_api():
   if request.method == 'GET':
     return jsonify({"events": _load_events()})
 
   if request.method == 'DELETE':
     payload = request.get_json(silent=True) or {}
-    event_id = str(payload.get("id"))
-    if not event_id:
+    raw_id = payload.get("id")
+    if not raw_id:
       return jsonify({'error': 'id is required to delete an event'}), 400
+    event_id = str(raw_id)
     events = _load_events()
     before = len(events)
     events = [e for e in events if str(e.get("id")) != event_id]
