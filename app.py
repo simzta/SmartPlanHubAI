@@ -35,19 +35,14 @@ app.secret_key = os.getenv("FLASK_SECRET_KEY", "smartplanhub_secure_key")
 DEFAULT_ASSIGNMENTS = [
     {
         "name": "History Essay",
-        "due": "2025-01-30",
-        "progress": 0.50
+        "due": "2025-12-09",
+        "progress": 40
     },
     {
-        "name": "Math Homework 7",
-        "due": "2025-02-03",
+        "name": "Math Homework ",
+        "due": "2025-12-11",
         "progress": 0.20
     },
-    {
-        "name": "Computer Science Project",
-        "due": "2025-02-10",
-        "progress": 0.0
-    }
 ]
 
 
