@@ -121,5 +121,39 @@ body {
 .doc-chip { display: inline-flex; align-items: center; gap: 6px; padding: 6px 10px; border-radius: 999px; background: rgba(255,255,255,0.06); color: var(--text); text-decoration: none; border: 1px solid rgba(255,255,255,0.08); font-size: 12px; }
 
 
+/* Settings */
+.form {
+    display: block;
+    padding: 24px;
+}
+.integration {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    margin-top: 16px;
+}
+.integration > div {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.integration .btn.small {
+    margin-top: 0;
+    white-space: nowrap;
+}
+
+/* Save settings area */
+.actions {
+    margin-top: 24px;
+    display: flex;
+    justify-content: flex-end;
+}
+
+.actions .btn + .btn {
+    margin-left: 8px;
+}
+
 /* Footer */
 .site-footer { padding: 24px; text-align: center; color: var(--muted); }
