@@ -54,11 +54,15 @@ document.addEventListener("DOMContentLoaded", () => {
         .then(res => res.json())
         .then(data => {
             hideTyping();
-            addMessage("bot-message", data.response);
+            const reply = (data && data.response) ? data.response : "I'm still piecing together the latest info—please try again.";
+            addMessage("bot-message", reply);
+            if (data && data.error) {
+                addMessage("bot-message", "Heads up: " + data.error);
+            }
         })
         .catch(() => {
             hideTyping();
-            addMessage("bot-message", "Server error.");
+            addMessage("bot-message", "I can't reach the server right now—please try again in a moment.");
         });
 
         input.value = "";

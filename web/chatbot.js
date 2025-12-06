@@ -66,11 +66,15 @@ document.addEventListener("DOMContentLoaded", () => {
       .then((res) => res.json())
       .then((data) => {
         hideTyping();
-        addMessage("sp-chat-bot", data.response || "No response.");
+        const reply = (data && data.response) ? data.response : "I'm still gathering your info—please try again shortly.";
+        addMessage("sp-chat-bot", reply);
+        if (data && data.error) {
+          addMessage("sp-chat-bot", "Heads up: " + data.error);
+        }
       })
       .catch(() => {
         hideTyping();
-        addMessage("sp-chat-bot", "Server error.");
+        addMessage("sp-chat-bot", "I can't reach the server right now—please try again soon.");
       });
 
     input.value = "";
