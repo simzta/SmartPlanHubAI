@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>SmartPlanHub · Dashboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css" />
+    <link rel="stylesheet" href="chatbot.css" />
+</head>
+<body data-page="dashboard">
+    <header class="site-header">
+        <a class="brand" href="index.html">SmartPlanHub</a>
+        <nav class="site-nav" aria-label="Primary">
+            <a href="dashboard.html" class="active">Dashboard</a>
+            <a href="assignments.html">Assignments</a>
+            <a href="calendar.html">Calendar</a>
+            <a href="settings.html">Settings</a>
+            <a href="/chatbot">Chatbot</a>
+        </nav>
+        <button class="nav-toggle" aria-label="Toggle menu">☰</button>
+    </header>
+
+
+    <main class="container grid-3">
+        <section class="card">
+            <div class="card__header">
+                <h2>Upcoming</h2>
+                <a class="link" href="assignments.html">See all</a>
+            </div>
+            <ul id="upcoming-list" class="list"></ul>
+        </section>
+
+
+        <section class="card">
+            <div class="card__header">
+                <h2>Week at a glance</h2>
+                <a class="link" href="calendar.html">Open calendar</a>
+            </div>
+            <div id="week-preview" class="calendar-preview"></div>
+        </section>
+
+
+        <section class="card">
+            <div class="card__header">
+                <h2>Focus suggestions</h2>
+            </div>
+            <ul id="suggestions" class="list"></ul>
+            <!-- TODO: Later use OpenAI to generate study suggestions from schedule+assignments. -->
+        </section>
+    </main>
+
+
+    <footer class="site-footer">
+    <p>© <span id="year"></span> SmartPlanHub</p>
+    </footer>
+
+
+    <script src="app.js"></script>
+    <script src="chatbot.js"></script>
+</body>
+</html>
